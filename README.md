@@ -5,17 +5,17 @@ Estimates nearest neighbor kernel conditional densities tuned using
 CDE loss.
 
 Installation
-===
-Use the =devtools= package to install from Github
+---
+Use the `devtools` package to install from Github
 
-```{r}
+```r
 devtools::install_github("tpospisi/NNKCDE")
 ```
 
 Usage
-===
+---
 
-```{r}
+```r
 fit <- NNKCDE$new(x_train, z_train)
 fit$tune(x_validation, z_validation, k_grid = c(5, 10, 15, 20))
 fit$predict(x_test, z_grid, h = 0.1)
