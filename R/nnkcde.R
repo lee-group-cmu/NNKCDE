@@ -42,6 +42,7 @@
 #' fit$tune(x_validation, z_validation, k_grid = c(5, 10, 15, 20))
 #' fit$predict(x_test, z_grid, h = 0.1)
 #' }
+#' @export
 NULL
 
 #' @importFrom R6 R6Class
