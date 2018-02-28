@@ -139,7 +139,7 @@ function(x_validation, z_validation, k_grid = NULL, h = NULL) {
   term1 <- term1 * (2 * pi) ^ (-n_dim / 2) / (det * sqrt(2))
   errors <- (term1 - 2 * term2) / n_validation
 
-  self$k <- which.min(errors)
+  self$k <- k_grid[which.min(errors)]
   self$h <- h
   return(errors)
 })
