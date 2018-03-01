@@ -18,5 +18,5 @@ Suggests:
     cdetools,
     lintr,
 RoxygenNote: 6.0.1
-Remote:
+Remotes:
     tpospisi/cdetools
