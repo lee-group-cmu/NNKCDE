@@ -1,5 +1,6 @@
 NNKCDE: Nearest Neighbor Conditional Density Estimation
 ===
+[![Build Status](https://travis-ci.org/tpospisi/NNKCDE.svg?branch=master)](https://travis-ci.org/tpospisi/NNKCDE)
 
 Estimates nearest neighbor kernel conditional densities tuned using
 CDE loss.
