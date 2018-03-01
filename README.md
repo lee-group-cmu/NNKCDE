@@ -17,6 +17,7 @@ Usage
 
 ```r
 fit <- NNKCDE$new(x_train, z_train)
+fit$estimate_error(x_validation, z_validation)
 fit$tune(x_validation, z_validation, k_grid = c(5, 10, 15, 20))
 fit$predict(x_test, z_grid, h = 0.1)
 ```

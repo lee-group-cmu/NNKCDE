@@ -71,6 +71,44 @@ function(x_train, z_train, k = NULL, h = NULL) {
 
 NNKCDE$set("public", "tune",
 function(x_validation, z_validation, k_grid = NULL, h = NULL) {
+  loss_df <- self$estimate_loss(x_validation, z_validation, k_grid, h)
+  self$k <- loss_df$k[which.min(loss_df$loss)]
+  self$h <- h
+  return(loss_df)
+})
+
+NNKCDE$set("public", "predict",
+function(x_grid, z_grid, k = NULL, h = NULL) {
+  if (is.null(k)) {
+    k <- self$k
+    stopifnot(!is.null(k))
+  }
+  if (is.null(h)) {
+    h <- self$h
+    stopifnot(!is.null(h))
+  }
+
+  x_grid <- as.matrix(x_grid)
+  z_grid <- as.matrix(z_grid)
+
+  stopifnot(ncol(x_grid) == ncol(self$x))
+
+  cdes <- matrix(NA, nrow(x_grid), nrow(z_grid))
+  orders <- FNN::knnx.index(self$x, x_grid, k = k)
+  for (ii in seq_len(nrow(x_grid))) {
+    subset <- self$z[orders[ii, ], , drop = FALSE] #nolint
+    if (ncol(self$z) == 1) {
+      cdes[ii, ] <- ks::kde(subset, h = h, eval.points = z_grid)$estimate
+    } else {
+      cdes[ii, ] <- ks::kde(subset, H = h, eval.points = z_grid)$estimate
+    }
+  }
+
+  return(cdes)
+})
+
+NNKCDE$set("public", "estimate_loss",
+function(x_validation, z_validation, k_grid= NULL, h = NULL) {
   x_validation <- as.matrix(x_validation)
   z_validation <- as.matrix(z_validation)
 
@@ -80,7 +118,9 @@ function(x_validation, z_validation, k_grid = NULL, h = NULL) {
 
   if (is.null(k_grid)) {
     stopifnot(!is.null(self$k))
+    k_grid <- self$k
   }
+  k_grid <- sort(k_grid)
 
   if (is.null(h)) {
     if (n_dim == 1) {
@@ -137,39 +177,7 @@ function(x_validation, z_validation, k_grid = NULL, h = NULL) {
   }
 
   term1 <- term1 * (2 * pi) ^ (-n_dim / 2) / (det * sqrt(2))
-  errors <- (term1 - 2 * term2) / n_validation
 
-  self$k <- k_grid[which.min(errors)]
-  self$h <- h
-  return(errors)
-})
-
-NNKCDE$set("public", "predict",
-function(x_grid, z_grid, k = NULL, h = NULL) {
-  if (is.null(k)) {
-    k <- self$k
-    stopifnot(!is.null(k))
-  }
-  if (is.null(h)) {
-    h <- self$h
-    stopifnot(!is.null(h))
-  }
-
-  x_grid <- as.matrix(x_grid)
-  z_grid <- as.matrix(z_grid)
-
-  stopifnot(ncol(x_grid) == ncol(self$x))
-
-  cdes <- matrix(NA, nrow(x_grid), nrow(z_grid))
-  orders <- FNN::knnx.index(self$x, x_grid, k = k)
-  for (ii in seq_len(nrow(x_grid))) {
-    subset <- self$z[orders[ii, ], , drop = FALSE] #nolint
-    if (ncol(self$z) == 1) {
-      cdes[ii, ] <- ks::kde(subset, h = h, eval.points = z_grid)$estimate
-    } else {
-      cdes[ii, ] <- ks::kde(subset, H = h, eval.points = z_grid)$estimate
-    }
-  }
-
-  return(cdes)
+  return(data.frame(loss = (term1 - 2 * term2) / n_validation,
+                    k = k_grid))
 })
