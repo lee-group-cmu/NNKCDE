@@ -16,14 +16,13 @@ if (requireNamespace("cdetools", quietly = TRUE)) {
     x_validation <- runif(n_validation)
     z_validation <- rnorm(n_validation, x_validation, 1)
 
-    obj <- NNKCDE$new(x_train, z_train)
-
     for (h in c(0.1, 1.0, 3.0)) {
+      obj <- NNKCDE$new(x_train, z_train, h = h)
       for (k in c(1, 5, 10)) {
-        cde <- obj$predict(x_validation, z_grid, k, h)
+        cde <- obj$predict(x_validation, z_grid, k)
         expected <- cdetools::cde_loss(cde, z_grid, z_validation)$loss
 
-        loss <- obj$estimate_loss(x_validation, z_validation, k, h)$loss
+        loss <- obj$estimate_loss(x_validation, z_validation, k)$loss
 
         expect_equal(loss, expected, tol = 1e-2)
       }

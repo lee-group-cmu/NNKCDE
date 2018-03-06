@@ -70,11 +70,13 @@ function(x_train, z_train, k = NULL, h = NULL) {
 })
 
 NNKCDE$set("public", "tune",
-function(x_validation, z_validation, k_grid = NULL, h = NULL) {
-  loss_df <- self$estimate_loss(x_validation, z_validation, k_grid, h)
-  self$k <- loss_df$k[which.min(loss_df$loss)]
-  self$h <- h
-  return(loss_df)
+function(x_validation, z_validation, k_grid = NULL) {
+  fits <- self$estimate_loss(x_validation, z_validation, k_grid)
+
+  min_id <- which.min(fits$loss)
+  self$k <- fits$k[min_id]
+
+  return(fits)
 })
 
 NNKCDE$set("public", "predict",
@@ -108,7 +110,7 @@ function(x_grid, z_grid, k = NULL, h = NULL) {
 })
 
 NNKCDE$set("public", "estimate_loss",
-function(x_validation, z_validation, k_grid= NULL, h = NULL) {
+function(x_validation, z_validation, k_grid = NULL) {
   x_validation <- as.matrix(x_validation)
   z_validation <- as.matrix(z_validation)
 
@@ -122,12 +124,14 @@ function(x_validation, z_validation, k_grid= NULL, h = NULL) {
   }
   k_grid <- sort(k_grid)
 
-  if (is.null(h)) {
+  if (is.null(self$h)) {
     if (n_dim == 1) {
       h <- ks::hpi(self$z)
     } else {
       h <- ks::Hpi(self$z)
     }
+  } else {
+    h <- self$h
   }
 
   stopifnot(nrow(x_validation) == n_validation)
@@ -178,6 +182,6 @@ function(x_validation, z_validation, k_grid= NULL, h = NULL) {
 
   term1 <- term1 * (2 * pi) ^ (-n_dim / 2) / (det * sqrt(2))
 
-  return(data.frame(loss = (term1 - 2 * term2) / n_validation,
-                    k = k_grid))
+  return(list(loss = (term1 - 2 * term2) / n_validation,
+              k = k_grid))
 })

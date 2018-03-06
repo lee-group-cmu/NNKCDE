@@ -20,18 +20,17 @@ test_that("Sample usage case works", {
   z_test <- runif(n_test, 0, x_test)
 
   ## Train
-  obj <- NNKCDE$new(x_train, z_train)
+  obj <- NNKCDE$new(x_train, z_train, h = 0.05)
 
   ## Estimate errors
   k_grid <- 1:10
-  loss_df <- obj$estimate_loss(x_validation, z_validation, k_grid = k_grid)
-  expect_equal(nrow(loss_df), 10)
-  expect_true(all(k_grid %in% loss_df$k))
+  loss_list <- obj$estimate_loss(x_validation, z_validation, k_grid = k_grid)
+  expect_equal(length(loss_list$loss), 10)
+  expect_equal(k_grid, loss_list$k)
 
   ## Tune to minimum loss
-  obj$tune(x_validation, z_validation, k_grid = seq(1, 20, 100), h = 0.05)
+  obj$tune(x_validation, z_validation, k_grid = seq(1, 20, 100))
   expect_false(is.null(obj$k))
-  expect_false(is.null(obj$h))
 
   cdes <- obj$predict(x_test, z_grid)
   expect_equal(dim(cdes), c(n_test, n_grid))
