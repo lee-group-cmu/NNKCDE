@@ -26,7 +26,6 @@
 #' \code{$new(x_train, z_train, k=NULL, h=NULL)} Initializes a new
 #'   NNKCDE object.
 #'
-#'
 #' \code{$tune(x_validation, z_validation, k_grid = NULL, h_grid =
 #'   NULL)} Selects the parameters which minimize the CDE loss; sets
 #'   the attributes k and h accordingly.
@@ -123,6 +122,7 @@ function(x_validation, z_validation, k_grid = NULL) {
     k_grid <- self$k
   }
   k_grid <- sort(k_grid)
+  k_max <- k_grid[length(k_grid)]
 
   if (is.null(self$h)) {
     if (n_dim == 1) {
@@ -147,26 +147,28 @@ function(x_validation, z_validation, k_grid = NULL) {
     invh <- solve(h)
   }
 
-  d <- matrix(NA, n_train, n_train)
-  for (ii in 1:n_train) {
-    for (jj in 1:n_train) {
-      delta <- self$z[ii, ] - self$z[jj, ]
-      d[ii, jj] <- t(delta) %*% invh %*% delta
-    }
-  }
-  d <- exp(-d / 4)
 
   term1 <- rep(0.0, length(k_grid))
   term2 <- rep(0.0, length(k_grid))
   for (ii in 1:n_validation) {
+    ids <- orders[ii, seq_len(k_max)]
+
+    d <- matrix(NA, k_max, k_max)
+    for (aa in seq_len(k_max)) {
+      for (bb in seq_len(k_max)) {
+        delta <- self$z[ids[aa], ] - self$z[ids[bb], ]
+        d[aa, bb] <- t(delta) %*% invh %*% delta
+      }
+    }
+    d <- exp(-d / 4)
+
     cde_est <- 0.0
     integral_est <- 0.0
     last_k <- 0
     z <- z_validation[ii, ]
     for (kk in seq_along(k_grid)) {
-      ids <- orders[ii, 1:k_grid[kk]]
       for (mk in (last_k + 1):k_grid[kk]) {
-        off <- sum(d[orders[ii, seq_len(mk - 1)], orders[ii, mk]])
+        off <- sum(d[seq_len(mk - 1), mk])
         diag_term <- 1.0
         integral_est <- integral_est + 2 * off + diag_term
 
@@ -174,13 +176,15 @@ function(x_validation, z_validation, k_grid = NULL) {
         tmp <- t(vec - z) %*% invh %*% (vec - z)
         cde_est <- cde_est + dnorm(sqrt(tmp), 0, 1) / det
       }
+
       last_k <- k_grid[kk]
       term1[kk] <- term1[kk] + integral_est / (k_grid[kk] ^ 2)
       term2[kk] <- term2[kk] + cde_est / k_grid[kk]
     }
   }
 
-  term1 <- term1 * (2 * pi) ^ (-n_dim / 2) / (det * sqrt(2))
+  term1const <- (2 * pi) ^ (-n_dim / 2) / (det * sqrt(2))
+  term1 <- term1 * term1const
 
   return(list(loss = (term1 - 2 * term2) / n_validation,
               k = k_grid))
