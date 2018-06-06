@@ -2,14 +2,15 @@ from setuptools import setup
 
 import numpy as np
 
-with open("README.rst", "r") as f:
+with open("README.md", "r") as f:
     README_TEXT = f.read()
 
 setup(name="nnkcde",
-      version="0.1",
+      version="0.2",
       license="MIT",
       description="Fits nearest neighbor kernel conditional density estimates",
       long_description = README_TEXT,
+      long_description_content_type='text/markdown; variant=GFM',
       author           = "Taylor Pospisil",
       author_email     = "tpospisi@andrew.cmu.edu",
       maintainer       = "tpospisi@andrew.cmu.edu",
