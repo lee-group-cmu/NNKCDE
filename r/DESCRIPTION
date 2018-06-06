@@ -1,11 +1,11 @@
 Package: NNKCDE
 Title: Nearest Neighbor Kernel Conditional Density Estimation
-Version: 0.1.1
+Version: 0.2
 Authors@R: person("Taylor", "Pospisil", email = "tpospisi@andrew.cmu.edu", role = c("aut", "cre"))
 Description: Estimates nearest neighbor kernel conditional densities tuned using CDE loss.
 URL: https://github.com/tpospisi/NNKCDE
 BugReports: https://github.com/tpospisi/NNKCDE/issues
-Depends: R (>= 3.4.2),
+Depends: R (>= 3.4.0),
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
