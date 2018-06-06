@@ -15,15 +15,15 @@ test_that("NNKCDE matches density estimate for k=n", {
 
   for (h in c(0.2, 0.9, 1.0, 3.2, 4.5)) {
     x_obs <- runif(1)
-    H <- diag(h, 2)
-    expected <- ks::kde(z_train, H = H, eval.points = z_grid)$estimate
-    preds <- obj$predict(x_obs, z_grid, k = n_train, h = H)
+    bandwidth <- diag(h, 2)
+    expected <- ks::kde(z_train, H = bandwidth, eval.points = z_grid)$estimate
+    preds <- obj$predict(x_obs, z_grid, k = n_train, h = bandwidth)
 
     expect_equal(as.vector(preds), as.vector(expected))
   }
 
-  H <- matrix(c(0.9, 0.4, 0.4, 0.9), 2, 2)
-  expected <- ks::kde(z_train, H = H, eval.points = z_grid)$estimate
-  preds <- obj$predict(x_obs, z_grid, k = n_train, h = H)
+  bandwidth <- matrix(c(0.9, 0.4, 0.4, 0.9), 2, 2)
+  expected <- ks::kde(z_train, H = bandwidth, eval.points = z_grid)$estimate
+  preds <- obj$predict(x_obs, z_grid, k = n_train, h = bandwidth)
   expect_equal(as.vector(preds), as.vector(expected))
 })
