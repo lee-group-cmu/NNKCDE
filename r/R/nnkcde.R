@@ -69,13 +69,30 @@ function(x_train, z_train, k = NULL, h = NULL) {
 })
 
 NNKCDE$set("public", "tune",
-function(x_validation, z_validation, k_grid = NULL) {
-  fits <- self$estimate_loss(x_validation, z_validation, k_grid)
+function(x_validation, z_validation, k_grid = NULL, h_grid = NULL) {
+  min_loss <- Inf
+  min_k <- NULL
+  min_h <- NULL
 
-  min_id <- which.min(fits$loss)
-  self$k <- fits$k[min_id]
+  if (is.null(h_grid)) {
+    h_grid <- list(self$h)
+  }
 
-  return(fits)
+  for (h in h_grid) {
+    fits <- self$estimate_loss(x_validation, z_validation, k_grid)
+    min_id <- which.min(fits$loss)
+
+    if (fits$loss[min_id] < min_loss) {
+      min_loss <- fits$loss[min_id]
+      min_k <- fits$k[min_id]
+      min_h <- h
+    }
+  }
+
+  self$k <- min_k
+  self$h <- min_h
+
+  return(min_loss)
 })
 
 NNKCDE$set("public", "predict",
