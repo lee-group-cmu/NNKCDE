@@ -165,19 +165,36 @@ function(x_validation, z_validation, k_grid = NULL) {
   }
 
 
+  # pick d calculation which minimizes computation
+  recalculate_d <- k_max * k_max * n_validation < n_train * n_train
+
+  if (!recalculate_d) {
+    d <- matrix(NA, n_train, n_train)
+    for (ii in 1:n_train) {
+      for (jj in 1:n_train) {
+        delta <- self$z[ii, ] - self$z[jj, ]
+        d[ii, jj] <- t(delta) %*% invh %*% delta
+      }
+    }
+    d <- exp(-d / 4)
+  }
+
+
   term1 <- rep(0.0, length(k_grid))
   term2 <- rep(0.0, length(k_grid))
   for (ii in 1:n_validation) {
     ids <- orders[ii, seq_len(k_max)]
 
-    d <- matrix(NA, k_max, k_max)
-    for (aa in seq_len(k_max)) {
-      for (bb in seq_len(k_max)) {
-        delta <- self$z[ids[aa], ] - self$z[ids[bb], ]
-        d[aa, bb] <- t(delta) %*% invh %*% delta
+    if (recalculate_d) {
+      d <- matrix(NA, k_max, k_max)
+      for (aa in seq_len(k_max)) {
+        for (bb in seq_len(k_max)) {
+          delta <- self$z[ids[aa], ] - self$z[ids[bb], ]
+          d[aa, bb] <- t(delta) %*% invh %*% delta
+        }
       }
+      d <- exp(-d / 4)
     }
-    d <- exp(-d / 4)
 
     cde_est <- 0.0
     integral_est <- 0.0
@@ -185,7 +202,11 @@ function(x_validation, z_validation, k_grid = NULL) {
     z <- z_validation[ii, ]
     for (kk in seq_along(k_grid)) {
       for (mk in (last_k + 1):k_grid[kk]) {
-        off <- sum(d[seq_len(mk - 1), mk])
+        if (recalculate_d) {
+          off <- sum(d[seq_len(mk - 1), mk])
+        } else {
+          off <- sum(d[orders[ii, seq_len(mk - 1)], orders[ii, mk]])
+        }
         diag_term <- 1.0
         integral_est <- integral_est + 2 * off + diag_term
 
