@@ -10,7 +10,7 @@ Installation
 Use the `devtools` package to install from Github
 
 ```r
-devtools::install_github("tpospisi/NNKCDE")
+devtools::install_github("tpospisi/NNKCDE/r")
 ```
 
 Usage
