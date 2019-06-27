@@ -19,4 +19,4 @@ Suggests:
     lintr,
 RoxygenNote: 6.0.1
 Remotes:
-    tpospisi/cdetools
+    tpospisi/cdetools/r
