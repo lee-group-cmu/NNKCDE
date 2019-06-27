@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
     README_TEXT = f.read()
 
 setup(name="nnkcde",
-      version="0.2",
+      version="0.3",
       license="MIT",
       description="Fits nearest neighbor kernel conditional density estimates",
       long_description = README_TEXT,

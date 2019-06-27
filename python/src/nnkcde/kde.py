@@ -1,8 +1,6 @@
 """Functions for kernel density estimation."""
 
-import numpy as np
 import statsmodels.api as sm
-import scipy.stats
 
 def kde(responses, grid, bandwidth):
     """Calculates the kernel density estimate.
@@ -35,15 +33,14 @@ def kde(responses, grid, bandwidth):
 
     n_grid, n_dim = grid.shape
     n_obs, _ = responses.shape
-    density = np.zeros(n_grid)
 
     if n_dim == 1:
         kde = sm.nonparametric.KDEUnivariate(responses[:, 0])
-        kde.fit(bw = bandwidth, fft = False)
+        kde.fit(bw=bandwidth, fft=False)
         return kde.evaluate(grid[:, 0])
     else:
         if isinstance(bandwidth, (float, int)):
             bandwidth = [bandwidth] * n_dim
-        kde = sm.nonparametric.KDEMultivariate(responses, var_type = "c" * n_dim,
-                                               bw = bandwidth)
+        kde = sm.nonparametric.KDEMultivariate(responses, var_type="c" * n_dim,
+                                               bw=bandwidth)
         return kde.pdf(grid)

@@ -22,7 +22,8 @@ def test_beta_example_performance():
     k = 100
     bandwidth = 0.1
 
-    obj = nnkcde.NNKCDE(x_train, z_train, k=k)
+    obj = nnkcde.NNKCDE(k=k)
+    obj.fit(x_train, z_train)
     n_grid = 1000
     z_grid = np.linspace(0, 1, n_grid)
     density = obj.predict(x_test, z_grid, bandwidth=bandwidth)
