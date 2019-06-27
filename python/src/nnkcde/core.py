@@ -5,9 +5,10 @@ import numpy as np
 from .kde import kde
 
 class NNKCDE(object):
-    def __init__(self, x_train, z_train, k=None):
+    def __init__(self, k=None):
         self.k = k
 
+    def fit(self, x_train, z_train):
         if len(z_train.shape) == 1:
             z_train = z_train.reshape(-1, 1)
         if len(x_train.shape) == 1:

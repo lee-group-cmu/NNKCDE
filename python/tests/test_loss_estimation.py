@@ -19,11 +19,11 @@ def test_loss_estimation():
     x_train, z_train = generate_data(1000)
     x_test, z_test = generate_data(1000)
 
-    obj = nnkcde.NNKCDE(x_train, z_train)
+    obj = nnkcde.NNKCDE()
+    obj.fit(x_train, z_train)
     n_grid = 1000
     z_grid = np.linspace(-5.0, 5.0, n_grid)
 
-#    for bandwidth in (0.1, 1.0, 3.0):
     for bandwidth in (1.0, 1.0):
         for k in (2, 5, 10, 100):
             cde = obj.predict(x_test, z_grid, k=k, bandwidth=bandwidth)
