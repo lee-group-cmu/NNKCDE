@@ -15,10 +15,8 @@ Citation
   journal={arXiv preprint arXiv:1805.05480},
   year={2018}
 }
-```
 
-```text
-@ARTICLE{dalmasso2020cdetools,
+@article{dalmasso2020cdetools,
        author = {{Dalmasso}, N. and {Pospisil}, T. and {Lee}, A.~B. and {Izbicki}, R. and
          {Freeman}, P.~E. and {Malz}, A.~I.},
         title = "{Conditional density estimation tools in python and R with applications to photometric redshifts and likelihood-free cosmological inference}",
